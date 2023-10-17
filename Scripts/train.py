@@ -23,7 +23,7 @@ def load_data(path):
         - peakrpm: the peak speed of the car
         - citympg: the city milage of the car
         - horsepower: the horse power of the car in 
-        - fueltype_diesel: True if fueltype is diesel
+        - fueltpye_diesel: True if fueltype is diesel
         - fueltype_gas: True if fueltype is gas
         - price: the price of the car
     """
