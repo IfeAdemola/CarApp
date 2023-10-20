@@ -28,8 +28,8 @@ else:
 
 if st.button('Predict car price'):
     data = np.array([[volume, curbweight, peakrpm, citympg, horsepower, fueltype_diesel, fueltype_gas]])
-    result = predict(data)
-    st.write(result[0])
+    price = predict(data)
+    st.write(price[0])
           
 
 
