@@ -1,13 +1,11 @@
 import pandas as pd
-import numpy as np
-import pickle
-import matplotlib.pyplot as plt
-import seaborn as sns
+import joblib
+import argparse
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
-from sklearn.linear_model import LinearRegression
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
+from preprocessing import train_preprocessor
 
 def load_data(path):
     """Load the csv file which contains the dataset
@@ -30,28 +28,6 @@ def load_data(path):
     df = pd.read_csv(path) 
     return df
 
-def  split_data(df):
-    """split the dataset into train and test data
-
-    Args:
-        df (DataFrame): the dataset loaded into a pandas DataFrame object.
-
-    Returns:
-        DataFrame: X_train, X_test, y_train, y_test
-        X_train, X_test, y_train, y_test are the training and testing data sets.
-        X_train and X_test are the input features and y_train and y_test are the target values.
-        The input features are the columns volume, curbweight, peakrpm, citympg, horsepower, fueltype_diesel, fueltype_gas.
-        The target values are the column price.
-    """
-    X = df.iloc[:, :-1]
-    y = df['price']
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-    
-    # Normalise data
-    sc = StandardScaler()
-    X_train = sc.fit_transform(X_train)
-    X_test = sc.transform(X_test)
-    return X_train, X_test, y_train, y_test
 
 def train_model(X_train, X_test, y_train, y_test):
     """training a random forest regression model
@@ -69,11 +45,11 @@ def train_model(X_train, X_test, y_train, y_test):
     random_forest_model = RandomForestRegressor(random_state=42)
     random_forest_model.fit(X_train, y_train)
     # Make predictions on the test set
-    y_pred = random_forest_model.predict(X_test)
+    y_pred = random_forest_model.predict(X_train)
     # Evaluate the Random Forest model
-    mse = mean_squared_error(y_test, y_pred)
-    mae = mean_absolute_error(y_test, y_pred)
-    r2 = r2_score(y_test, y_pred)
+    mse = mean_squared_error(y_train, y_pred)
+    mae = mean_absolute_error(y_train, y_pred)
+    r2 = r2_score(y_train, y_pred)
 
     print("Random Forest Regressor:")
     print(f"Mean Squared Error: {mse:.2f}")
@@ -81,20 +57,40 @@ def train_model(X_train, X_test, y_train, y_test):
     print(f"R-squared: {r2:.2f}")
 
     return random_forest_model
+    
 
-def save_model(model):
-    # Save the model to a file
-    with open('model.pkl', 'wb') as file:
-        pickle.dump(model, file)
+def save_model(model, file_path):
+    """
+    Save a machine learning model to a file using joblib.
 
-def __main__():
-    df = load_data('Dataset\Processed-data\processed_data.csv')
-    X_train, X_test, y_train, y_test = split_data(df)
-    model = train_model(X_train, X_test, y_train, y_test)
-    save_model(model)
+    Args:
+        model: The trained machine learning model to be saved.
+        file_path (str): The file path where the model will be saved.
+    """
+    try:
+        joblib.dump(model, file_path)
+        print(f"Model saved to {file_path}")
+    except Exception as e:
+        print(f"Error while saving the model: {str(e)}")
+
+
+
+def main(data_path, model_path, ct_path):
+    df = load_data(data_path)
+    output = train_preprocessor(df)
+    model = train_model(*output['data'])
+    save_model(model, model_path)
+    save_model(output['preprocessor'], ct_path)
+
 
 if __name__ == '__main__':
-    __main__()
+    parser = argparse.ArgumentParser(description="Process data from a specified path")
+    parser.add_argument("--data_path", type=str, help="Path to the data file")
+    parser.add_argument("--model_path", type=str, help="Path to the model file")
+    parser.add_argument("--ct_path", type=str, help="Path to the transformer file")
+
+    args = parser.parse_args()
+    main(args.data_path, args.model_path, args.ct_path)
 
 
 
