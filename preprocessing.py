@@ -32,15 +32,15 @@ def inference_preprocessor(fueltype, horsepower, ct):
     carheight = np.random.uniform(47.8, 59.8)
     carwidth = np.random.uniform(60.3, 72.3)
     volume = carlength * carheight * carwidth
-
-    data = pd.DataFrame(
-        data={
-            'fueltype': fueltype,
-            'volume': volume,
-            'curbweight': curbweight,
-            'peakrpm': peakrpm,
-            'citympg': citympg,
-            'horsepower': horsepower})
+   
+    data={
+        'fueltype': fueltype,
+        'volume': volume,
+        'curbweight': curbweight,
+        'peakrpm': peakrpm,
+        'citympg': citympg,
+        'horsepower': horsepower}
+    data = pd.DataFrame([data])
     
     data = ct.transform(data)
     return data

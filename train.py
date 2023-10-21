@@ -45,11 +45,11 @@ def train_model(X_train, X_test, y_train, y_test):
     random_forest_model = RandomForestRegressor(random_state=42)
     random_forest_model.fit(X_train, y_train)
     # Make predictions on the test set
-    y_pred = random_forest_model.predict(X_test)
+    y_pred = random_forest_model.predict(X_train)
     # Evaluate the Random Forest model
-    mse = mean_squared_error(y_test, y_pred)
-    mae = mean_absolute_error(y_test, y_pred)
-    r2 = r2_score(y_test, y_pred)
+    mse = mean_squared_error(y_train, y_pred)
+    mae = mean_absolute_error(y_train, y_pred)
+    r2 = r2_score(y_train, y_pred)
 
     print("Random Forest Regressor:")
     print(f"Mean Squared Error: {mse:.2f}")
@@ -73,24 +73,6 @@ def save_model(model, file_path):
     except Exception as e:
         print(f"Error while saving the model: {str(e)}")
 
-def load_model(file_path):
-    """
-    Load a machine learning model from a file using joblib.
-
-    Args:
-        file_path (str): The file path from which to load the model.
-
-    Returns:
-        model: The loaded machine learning model.
-    """
-    try:
-        model = joblib.load(file_path)
-        print(f"Model loaded from {file_path}")
-        return model
-    except Exception as e:
-        print(f"Error while loading the model: {str(e)}")
-        return None
-
 
 
 def main(data_path, model_path, ct_path):
@@ -98,7 +80,7 @@ def main(data_path, model_path, ct_path):
     output = train_preprocessor(df)
     model = train_model(*output['data'])
     save_model(model, model_path)
-    save_model(output['ct'], ct_path)
+    save_model(output['preprocessor'], ct_path)
 
 
 if __name__ == '__main__':
