@@ -2,16 +2,13 @@
 FROM python:3.11-slim
 
 # Set the working directory in the container
-WORKDIR /app
+WORKDIR /streamlitapp
 
 # Copy the current directory contents into the container at /app
-COPY scripts/__init__.py scripts/__init__.py   
-COPY scripts/inference.py scripts/inference.py
-COPY scripts/preprocessing.py scripts/preprocessing.py
-COPY app/app.py .
-COPY app/requirements.txt .
-
-# . . copies all the files in the same folder as this dockerfile
+COPY app/ app/
+COPY artifacts/ artifacts/
+COPY app.py app.py
+COPY requirements.txt requirements.txt
 
 # Install any needed packages specified in requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
